@@ -1,0 +1,68 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Vidly.ViewModel.Movies
+<div class="text-md-start">
+    <h1 class="align-content-lg-start">Movies</h1>
+    <div class="my-3"> 
+        <a class="btn btn-primary m-auto"  href="Movies/New">New Movie</a>
+    </div>
+    <table id="movies" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Movies</th>
+                <th>Genre</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    </div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var table = $("#movies").DataTable({
+                ajax: {
+                    url: "api/movies",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function (data, type, movie) {
+                            return "<a href='movies/edit'" + movie.id + "'>" + movie.title + "</a>"; 
+                        }
+                    },
+                    {
+                        data: "genre.name"
+                    },
+                    {
+                        data: "id",
+                        render: function (data){
+                            return "<button class='btn btn-link js-delete' data-movie-id=" + data + ">Delete</button>";
+                        }
+                    }
+                ]
+            });
+            $("#movies").on("click", ".js-delete", function () {
+                var button = $(this);
+                bootbox.confirm("Are you sure you want to delete movie?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "api/movies/" + button.attr("data-movie-id"),
+                            method: "DELETE",
+                            success: function () {
+                                table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

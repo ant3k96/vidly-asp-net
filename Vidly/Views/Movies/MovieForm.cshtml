@@ -1,0 +1,50 @@
+﻿@using Vidly.ViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Save";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model MovieFormViewModel
+@{
+    if (Model.Movie.Id == 0)
+    {
+        <h2>New Movie</h2>
+    }else
+    {
+        <h2>Edit Movie</h2>
+    }
+}
+
+
+@using (Html.BeginForm("Save", "Movies")){
+    @Html.ValidationSummary(true, "Correct errors")
+    <div class="col-md-4 form-group">
+        @Html.LabelFor(m => m.Movie.Title, new {@class = "form-label"})
+        @Html.TextBoxFor(m => m.Movie.Title, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Movie.Title)
+    </div>
+    <div class="col-md-4 form-group">
+        @Html.LabelFor(m => m.Movie.ReleaseDate, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Movie.ReleaseDate, "{0:d, MMM, yyyy}", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Movie.ReleaseDate)
+    </div>
+    <div class="col-md-4 form-group">
+        @Html.LabelFor(m => m.Movie.Genre!.Id, "Genre", new { @class = "form-label" })
+        @Html.DropDownListFor(m => m.Movie.Genre!.Id, new SelectList(Model.Genres, "Id", "Name"), "Select Genre", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Movie.Genre!.Id)
+    </div>
+    <div class="col-md-4 form-group">
+        @Html.LabelFor(m => m.Movie.NumberInStock, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Movie.NumberInStock, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Movie.NumberInStock)
+    </div>
+    @Html.HiddenFor(m => m.Movie.Id)
+    @Html.AntiForgeryToken()
+    <button action="submit" class="btn btn-primary">Save</button>
+}
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

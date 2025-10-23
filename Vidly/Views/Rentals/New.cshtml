@@ -1,0 +1,144 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "New Rentals Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>New Rental</h2>
+
+<form id="newRental">
+    <div class="col-md-4 form-group">
+        <label>
+            Customer
+        </label>
+        <input id="customerSearch" name="customer" data-rule-validCustomer required type="text" value="" class="form-control" />
+    </div>
+    <div class="col-md-4 form-group">
+        <label>
+            Movie
+        </label>
+        <input id="movieSearch" name="movie" data-rule-validMovie type="text" value="" class="form-control" />
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <ul id="movies" class="list-group-flush"></ul>
+        </div>
+    </div>
+    <p>
+        <button class="btn btn-primary">Submit</button>
+    </p>
+    
+
+   
+</form>
+
+@section Scripts{
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            function split(val) {
+                return val.split(/,\s*/);
+            }
+            let vm = {
+                moviesId:[]
+            };
+            $("#customerSearch").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/api/Customers",
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function (data) {
+                            // Extract user names from response
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.name, // Displayed in dropdown
+                                    value: item.name,  // Inserted into input
+                                    id: item.id
+                                };
+                            }));
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    console.log("Selected " + ui.item.value + " id " + ui.item.id);
+                    vm.customerId = ui.item.id
+                },
+                minLength: 3 
+            });
+            $("#movieSearch").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/api/Movies", 
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function (data) {
+                            
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.title, 
+                                    value: item.title,  
+                                    id: item.id
+                                };
+                            }));
+                        }
+                    });
+                },
+                focus: function () {
+                    // prevent value inserted on focus
+                    return false;
+                },
+                select: function (event, ui) {
+                    var terms = split(this.value);
+                    // remove the current input
+                    console.log("terms:" + terms.pop());
+                    // add the selected item
+                    $("#movies").append("<li class='list-group-flush'>" + ui.item.value + "</li>");
+                    vm.moviesId.push(ui.item.id);
+                    $(this).val('');
+                    return false;
+                },
+                minLength: 2 // Start suggesting after 2 characters
+            });
+
+            $.validator.addMethod("validCustomer", function () {
+                return vm.customerId && vm.customerId !== 0;
+            }, "Please select valid customer")
+
+            $.validator.addMethod("validMovie", function () {
+                return vm.moviesId.length > 0;
+            }, "Please select at least one movie")
+
+            var validator = $("#newRental").validate({
+                submitHandler: function () {
+
+                    $.ajax({
+                        url: "/api/rentals",
+                        method: "POST",
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm)
+                    })
+                        .done(function () {
+                            toastr.success("Rentals successfully recorded");
+                            $("#customerSearch").val("");
+                            $("#movies").empty();
+                            vm = {
+                                moviesId: []
+                            }
+                            validator.resetForm();
+                        }).fail(function () {
+                            toastr.error("Something unexpected happened");
+                        });
+                }
+            });
+        });
+    </script>
+}

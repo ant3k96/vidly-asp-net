@@ -1,0 +1,42 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Vidly.ViewModel.Movies
+<div class="text-md-start">
+    <h1 class="align-content-lg-start">Movies</h1>
+    <table id="movies" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Movies</th>
+                <th>Genre</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    </div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var table = $("#movies").DataTable({
+                ajax: {
+                    url: "api/movies",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "title"
+                    },
+                    {
+                        data: "genre.name"
+                    }
+                ]
+            });
+            
+        });
+    </script>
+}

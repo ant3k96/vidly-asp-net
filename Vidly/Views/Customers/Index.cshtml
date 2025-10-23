@@ -1,0 +1,69 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Customers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Vidly.ViewModel.RandomMovieViewModel
+<div class="text-md-start">
+    <div class="my-3">
+        <a class="btn btn-primary m-auto" href="Customers/New">New Customer</a>
+    </div>
+    <table id="customers" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Customers</th>
+                <th>Subcription Name</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody class="text-start">
+        </tbody>
+    </table>
+   
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var table = $("#customers").DataTable({
+                ajax: {
+                    url: "api/customers",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function(data, type, customer){
+                            return "<a href='customers/edit/" + customer.id + "'>" + customer.name + "</a>";
+                        }
+                    },
+                    {
+                        data: "membershipType.name"
+                    },
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return "<button class='btn btn-link js-delete' data-customer-id=" + data + ">Delete</button>"
+                        }
+                    }
+                ]
+            });
+            $("#customers").on("click", ".js-delete", function () {
+                var button = $(this);
+                bootbox.confirm("Are you sure you want to delete customer?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "/api/customers/" + button.attr("data-customer-id"),
+                            method: "DELETE",
+                            success: function () {
+                                table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
