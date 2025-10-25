@@ -30,10 +30,11 @@ builder.Services.AddDefaultIdentity<VidlyIdentityUser>(options => options.SignIn
     .AddEntityFrameworkStores<VidlyDbContext>();
 
 builder.Services.AddAuthentication()
-   .AddGoogleOpenIdConnect(options =>
+   .AddCookie()
+   .AddGoogle(options =>
    {
-       options.ClientId = builder.Configuration["Authentication__Google__ClientId"];
-       options.ClientSecret = builder.Configuration["Authentication__Google__ClientSecret"];
+       options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+       options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
        options.CallbackPath = "/signin-google";
    });
 
@@ -44,6 +45,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Identity/Account/Login";  // Redirect if not authenticated
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // Redirect if unauthorized
+    //options.Cookie.SameSite = SameSiteMode.None;
+    //options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
 builder.Services.AddAutoMapper(typeof(VidlyMappingProfile));
