@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Polly;
 using System.Text.Json;
 using Vidly.Mapping;
 using Vidly.Models;
@@ -52,6 +54,21 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddAutoMapper(typeof(VidlyMappingProfile));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<VidlyDbContext>();
+    var policy = Policy
+        .Handle<SqlException>()
+        .Or<DbUpdateException>()
+        .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(5));
+
+    policy.Execute(() =>
+    {
+        db.Database.Migrate();
+        Console.WriteLine("Database migrated successfully.");
+    });
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,0 +1,36 @@
+services:
+  web:
+    build: ./Vidly
+    container_name: vidly
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=db;Database=MyAppDb;User Id=sa;Password=Your_password123;TrustServerCertificate=True;
+      - Authentication__Google__ClientId=
+      - Authentication__Google__ClientSecret=
+    networks:
+      - mynetwork
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_server
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Your_password123
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  sql_data:
