@@ -5,7 +5,7 @@ It provides a secure and intuitive platform for administrators and users to mana
 
 ---
 
-## Tech Stack
+## 🏗️ Tech Stack
 
 | Layer | Technology |
 |-------|-------------|
@@ -19,7 +19,7 @@ It provides a secure and intuitive platform for administrators and users to mana
 
 ---
 
-## Features
+## 🚀 Features
 
 **User Management**
 - Register and sign in using **ASP.NET Core Identity**
@@ -52,7 +52,7 @@ It provides a secure and intuitive platform for administrators and users to mana
 
 ---
 
-## Getting Started
+## ⚙️ Getting Started
 
 ### 1️ Prerequisites
 
@@ -79,7 +79,7 @@ Authentication__Google__ClientId=your-client-id.apps.googleusercontent.com
 Authentication__Google__ClientSecret=your-client-secret
 ```
 
-### 3 Run with docker
+### 3️⃣ Run with docker
 
 Go to main folder and run
 
